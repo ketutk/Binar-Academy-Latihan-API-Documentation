@@ -39,7 +39,7 @@ app.get("/houses/:houseId", async (req, res, next) => {
 
     return res.status(200).json({
       message: "Successfully get data",
-      data: houseData.rows,
+      data: houseData.rows[0],
     });
   } catch (error) {
     next(error);
@@ -68,6 +68,14 @@ app.put("/houses/:houseId", async (req, res, next) => {
     const { houseId } = req.params;
     const { address, owner_name, num_rooms, has_garden } = req.body;
 
+    const houseData = await pool.query(`select * from ${table} where id=$1;`, [houseId]);
+
+    if (houseData.rows.length < 1) {
+      return res.status(404).json({
+        message: "Data not found",
+      });
+    }
+
     const editData = await pool.query(
       `update ${table}
       set address=$1,owner_name=$2,num_rooms=$3,has_garden=$4
@@ -88,6 +96,14 @@ app.put("/houses/:houseId", async (req, res, next) => {
 app.delete("/houses/:houseId", async (req, res, next) => {
   try {
     const { houseId } = req.params;
+
+    const houseData = await pool.query(`select * from ${table} where id=$1;`, [houseId]);
+
+    if (houseData.rows.length < 1) {
+      return res.status(404).json({
+        message: "Data not found",
+      });
+    }
 
     const deleteData = await pool.query(
       `delete from ${table}
