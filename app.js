@@ -23,6 +23,7 @@ app.get("/houses", async (req, res, next) => {
     const housesData = await pool.query(`select * from ${table};`);
 
     return res.status(200).json({
+      status: true,
       message: "Successfully get all data",
       data: housesData.rows,
     });
@@ -37,7 +38,16 @@ app.get("/houses/:houseId", async (req, res, next) => {
     const { houseId } = req.params;
     const houseData = await pool.query(`select * from ${table} where id=$1;`, [houseId]);
 
+    if (houseData.rows.length < 1) {
+      return res.status(404).json({
+        status: false,
+        message: "Data not found",
+        data: null,
+      });
+    }
+
     return res.status(200).json({
+      status: true,
       message: "Successfully get data",
       data: houseData.rows[0],
     });
@@ -51,11 +61,20 @@ app.post("/houses", async (req, res, next) => {
   try {
     const { address, owner_name, num_rooms, has_garden } = req.body;
 
+    if (!address || !owner_name || !num_rooms || !has_garden) {
+      return res.status(400).json({
+        status: false,
+        message: "Please fill all the required data",
+        data: null,
+      });
+    }
+
     const createData = await pool.query(`insert into ${table}(address,owner_name,num_rooms,has_garden) values ($1,$2,$3,$4);`, [address, owner_name, num_rooms, has_garden]);
 
     return res.status(201).json({
+      status: true,
       message: "Successfully create data",
-      row_count: createData.rowCount,
+      data: createData.rowCount,
     });
   } catch (error) {
     next(error);
@@ -68,11 +87,21 @@ app.put("/houses/:houseId", async (req, res, next) => {
     const { houseId } = req.params;
     const { address, owner_name, num_rooms, has_garden } = req.body;
 
+    if (!address || !owner_name || !num_rooms || !has_garden) {
+      return res.status(400).json({
+        status: false,
+        message: "Please fill all the required data",
+        data: null,
+      });
+    }
+
     const houseData = await pool.query(`select * from ${table} where id=$1;`, [houseId]);
 
     if (houseData.rows.length < 1) {
       return res.status(404).json({
+        status: false,
         message: "Data not found",
+        data: null,
       });
     }
 
@@ -84,8 +113,9 @@ app.put("/houses/:houseId", async (req, res, next) => {
     );
 
     return res.status(200).json({
+      status: true,
       message: "Successfully edit data",
-      row_count: editData.rowCount,
+      data: editData.rowCount,
     });
   } catch (error) {
     next(error);
@@ -101,7 +131,9 @@ app.delete("/houses/:houseId", async (req, res, next) => {
 
     if (houseData.rows.length < 1) {
       return res.status(404).json({
+        status: false,
         message: "Data not found",
+        data: null,
       });
     }
 
@@ -112,8 +144,9 @@ app.delete("/houses/:houseId", async (req, res, next) => {
     );
 
     return res.status(200).json({
+      status: true,
       message: "Successfully delete data",
-      row_count: deleteData.rowCount,
+      data: deleteData.rowCount,
     });
   } catch (error) {
     next(error);
@@ -126,14 +159,18 @@ app.delete("/houses/:houseId", async (req, res, next) => {
 app.use((err, req, res, next) => {
   console.log(err);
   res.status(500).json({
+    status: false,
     err: err.message,
+    data: null,
   });
 });
 
 // 404 ERROR
 app.use((req, res, next) => {
   res.status(404).json({
+    status: false,
     err: `Server not found on ${req.url}`,
+    data: null,
   });
 });
 
