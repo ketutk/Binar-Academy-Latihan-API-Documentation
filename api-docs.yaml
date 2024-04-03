@@ -1,0 +1,259 @@
+openapi: 3.0.1
+
+info:
+  title: Simple API CRUD Houses
+  description: This is a simple API about CRUD Operations for table Houses
+  termsOfService: https://example.com/terms/
+  contact:
+    name: API Support
+    url: https://www.example.com/support
+    email: support@example.com
+  version: 1.0.1
+servers:
+  - url: http://localhost:3000/v1
+
+paths:
+  /houses:
+    post:
+      summary: register data houses baru
+      description: Mendaftarkan data houses baru kedalam database
+      tags:
+        - House
+
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/House"
+      responses:
+        201:
+          description: success
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: OK
+                  data:
+                    type: number
+                    example: 1
+
+        400:
+          description: Empty required field
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Please fill all the required data
+                  data:
+                    type: object
+                    example: null
+    get:
+      summary: get all house data
+      # parameters:
+      #   - schema:
+      #       type: string
+      #     name: search
+      #     in: query
+      tags:
+        - House
+      responses:
+        200:
+          description: success
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Successfully get all data
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/House"
+  /houses/{id}:
+    get:
+      summary: get house detail
+      description: Mendapatkan detail data house
+      tags:
+        - House
+      parameters:
+        - schema:
+            type: integer
+          name: id
+          in: path
+          required: true
+      responses:
+        200:
+          description: success
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Successfully get data
+                  data:
+                    $ref: "#/components/schemas/House"
+        404:
+          description: House data not found
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Data not found
+                  data:
+                    type: object
+                    example: null
+    put:
+      summary: Edit house data
+      description: Merubah data house
+      tags:
+        - House
+      parameters:
+        - schema:
+            type: integer
+          name: id
+          in: path
+          required: true
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/House"
+      responses:
+        200:
+          description: success
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Successfully edit data
+                  data:
+                    type: number
+                    example: 1
+        400:
+          description: Empty required field
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Please fill all the required data
+                  data:
+                    type: object
+                    example: null
+        404:
+          description: House data not found
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Data not found
+                  data:
+                    type: object
+                    example: null
+    delete:
+      summary: delete house data
+      description: Menghapus data house dari database
+      tags:
+        - House
+      parameters:
+        - schema:
+            type: integer
+          name: id
+          in: path
+          required: true
+      responses:
+        200:
+          description: success
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Successfully delete data
+                  data:
+                    type: number
+                    example: 1
+        404:
+          description: House data not found
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Data not found
+                  data:
+                    type: object
+                    example: null
+
+components:
+  schemas:
+    House:
+      type: object
+      properties:
+        address:
+          type: string
+          example: Bonang
+        owner_name:
+          type: string
+          example: Ketut
+        num_rooms:
+          type: integer
+          example: 3
+        has_garden:
+          type: boolean
+          example: true
